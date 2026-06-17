@@ -23,6 +23,7 @@ export function OrcaVideoPlayer({
   controls = false,
   resizeMode = 'contain',
   preload = false,
+  loop = false,
   onProgress,
   onEnd,
   style,
@@ -37,6 +38,7 @@ export function OrcaVideoPlayer({
     controls,
     resizeMode,
     preload,
+    loop,
     onProgress: callback(onProgress ?? noop),
     onEnd: callback(onEnd ?? noop),
   } as NativeOrcaVideoPlayerViewProps;

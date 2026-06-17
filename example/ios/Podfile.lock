@@ -26,7 +26,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - OrcaVideoPlayer (0.1.0):
+  - OrcaVideoPlayer (0.2.1):
     - hermes-engine
     - NitroModules
     - RCTRequired
@@ -2031,7 +2031,7 @@ SPEC CHECKSUMS:
   FBLazyVector: c00c20551d40126351a6783c47ce75f5b374851b
   hermes-engine: 29aba161e7e6e49347e5c097d7af3a984579d3ca
   NitroModules: 16bc17a076b12304d608f7c915b9d321f56dfc19
-  OrcaVideoPlayer: e85218c15f5705235fe54ccac575eb8fdb482403
+  OrcaVideoPlayer: 135a914659a9dfd7a2c7454d33e3d4764ade456e
   RCTDeprecation: 3bb167081b134461cfeb875ff7ae1945f8635257
   RCTRequired: 74839f55d5058a133a0bc4569b0afec750957f64
   RCTSwiftUI: 87a316382f3eab4dd13d2a0d0fd2adcce917361a

@@ -9,12 +9,14 @@ class HybridOrcaVideoPlayerView: HybridOrcaVideoPlayerViewSpec {
   var controls: Bool = false
   var resizeMode: ResizeMode = .contain
   var preload: Bool = false
+  var loop: Bool = false
   var onProgress: (Double) -> Void = { _ in }
   var onEnd: () -> Void = {}
 
   private let containerView = UIView()
   private let playerViewController = AVPlayerViewController()
   private var player: AVPlayer?
+  private var playerLooper: AVPlayerLooper?
   private var timeObserver: Any?
   private var endObserver: NSObjectProtocol?
   private var statusObserver: NSKeyValueObservation?
@@ -38,6 +40,7 @@ class HybridOrcaVideoPlayerView: HybridOrcaVideoPlayerViewSpec {
 
   func afterUpdate() {
     applySourceIfNeeded()
+    applyLoopModeIfNeeded()
     player?.isMuted = muted
     playerViewController.showsPlaybackControls = controls
     playerViewController.videoGravity = videoGravity(for: resizeMode)
@@ -79,13 +82,14 @@ class HybridOrcaVideoPlayerView: HybridOrcaVideoPlayerViewSpec {
     }
 
     let item = AVPlayerItem(url: url)
-    let newPlayer = AVPlayer(playerItem: item)
+    let newPlayer = AVQueuePlayer(playerItem: item)
     newPlayer.automaticallyWaitsToMinimizeStalling = true
     player = newPlayer
     playerViewController.player = newPlayer
     newPlayer.isMuted = muted
 
     setupObservers(for: newPlayer, item: item)
+    applyLoopMode(for: newPlayer, item: item)
 
     if preload && !autoplay {
       configurePreload(for: item, player: newPlayer)
@@ -146,7 +150,27 @@ class HybridOrcaVideoPlayerView: HybridOrcaVideoPlayerViewSpec {
       object: item,
       queue: .main
     ) { [weak self] _ in
-      self?.onEnd()
+      guard let self, !self.loop else {
+        return
+      }
+      self.onEnd()
+    }
+  }
+
+  private func applyLoopModeIfNeeded() {
+    guard let queuePlayer = player as? AVQueuePlayer,
+          let item = queuePlayer.currentItem else {
+      return
+    }
+    applyLoopMode(for: queuePlayer, item: item)
+  }
+
+  private func applyLoopMode(for player: AVQueuePlayer, item: AVPlayerItem) {
+    playerLooper?.disableLooping()
+    playerLooper = nil
+
+    if loop {
+      playerLooper = AVPlayerLooper(player: player, templateItem: item)
     }
   }
 
@@ -167,6 +191,8 @@ class HybridOrcaVideoPlayerView: HybridOrcaVideoPlayerViewSpec {
 
   private func cleanup() {
     cleanupObservers()
+    playerLooper?.disableLooping()
+    playerLooper = nil
     player?.pause()
     player?.replaceCurrentItem(with: nil)
     playerViewController.player = nil

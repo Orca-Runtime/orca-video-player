@@ -12,6 +12,7 @@ const OrcaVideoPlayerViewConfig = {
     controls: true,
     resizeMode: true,
     preload: true,
+    loop: true,
     onProgress: true,
     onEnd: true,
     hybridRef: true,

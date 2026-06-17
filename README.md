@@ -74,6 +74,19 @@ import { OrcaVideoPlayer } from '@orca-runtime/orca-video-player';
 />;
 ```
 
+### Looping
+
+Replay the same source indefinitely in a single player instance. When `loop` is enabled, `onEnd` is not called:
+
+```tsx
+<OrcaVideoPlayer
+  source={{ uri: 'https://example.com/video.mp4' }}
+  loop
+  autoplay
+  muted
+/>
+```
+
 ## OrcaVideoPlayer props
 
 | Prop         | Type                                    | Default     | Description |
@@ -85,8 +98,9 @@ import { OrcaVideoPlayer } from '@orca-runtime/orca-video-player';
 | `controls`   | `boolean`                               | `false`     | Show native playback controls |
 | `resizeMode` | `'cover' \| 'contain' \| 'stretch'`   | `'contain'` | How video fills the view |
 | `preload`    | `boolean`                               | `false`     | Buffer the video in the player without starting playback (unless `autoplay` is also set) |
+| `loop`       | `boolean`                               | `false`     | Replay the same source indefinitely. When `true`, `onEnd` is not called |
 | `onProgress` | `(time: number) => void`                | —           | Called with current time in seconds |
-| `onEnd`      | `() => void`                            | —           | Called when playback finishes |
+| `onEnd`      | `() => void`                            | —           | Called when playback finishes (not called when `loop` is `true`) |
 | `style`      | `StyleProp<ViewStyle>`                  | —           | Container style |
 
 ### VideoSource

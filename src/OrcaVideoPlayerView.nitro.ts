@@ -17,6 +17,7 @@ export interface OrcaVideoPlayerViewProps extends HybridViewProps {
   controls: boolean;
   resizeMode: ResizeMode;
   preload: boolean;
+  loop: boolean;
   onProgress: (time: number) => void;
   onEnd: () => void;
 }

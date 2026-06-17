@@ -30,6 +30,7 @@ export function OrcaVideoPlayer({
   controls = false,
   resizeMode = 'contain',
   preload = false,
+  loop = false,
   onProgress,
   onEnd,
   style,
@@ -62,6 +63,7 @@ export function OrcaVideoPlayer({
         autoPlay: autoplay,
         muted,
         controls,
+        loop,
         playsInline: true,
         style: {
           width: '100%',
@@ -72,7 +74,9 @@ export function OrcaVideoPlayer({
           onProgress?.(videoRef.current?.currentTime ?? 0);
         },
         onEnded: () => {
-          onEnd?.();
+          if (!loop) {
+            onEnd?.();
+          }
         },
       })}
     </View>

@@ -19,6 +19,7 @@ class HybridOrcaVideoPlayerView(
   override var controls: Boolean = false
   override var resizeMode: ResizeMode = ResizeMode.CONTAIN
   override var preload: Boolean = false
+  override var loop: Boolean = false
   override var onProgress: (time: Double) -> Unit = {}
   override var onEnd: () -> Unit = {}
 
@@ -40,7 +41,7 @@ class HybridOrcaVideoPlayerView(
   private val playerListener =
     object : Player.Listener {
       override fun onPlaybackStateChanged(playbackState: Int) {
-        if (playbackState == Player.STATE_ENDED) {
+        if (playbackState == Player.STATE_ENDED && !loop) {
           onEnd()
         }
       }
@@ -63,6 +64,7 @@ class HybridOrcaVideoPlayerView(
     player.volume = if (muted) 0f else 1f
     playerView.useController = controls
     playerView.resizeMode = mapResizeMode(resizeMode)
+    player.repeatMode = if (loop) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
 
     if (autoplay) {
       player.playWhenReady = true

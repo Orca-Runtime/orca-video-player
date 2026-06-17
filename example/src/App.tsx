@@ -65,13 +65,14 @@ export default function App() {
 
       <ScrollView contentContainerStyle={styles.players}>
         <View style={styles.playerSection}>
-          <Text style={styles.sectionTitle}>With preload</Text>
+          <Text style={styles.sectionTitle}>With preload (looping)</Text>
           <OrcaVideoPlayer
             style={styles.player}
             source={source}
             uriIndex={uriIndex}
             preload
-            autoplay={false}
+            loop
+            autoplay
             muted
             controls
             resizeMode="cover"

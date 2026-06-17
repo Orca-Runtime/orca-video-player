@@ -18,6 +18,8 @@ export interface OrcaVideoPlayerProps {
   resizeMode?: ResizeMode;
   /** Prepare and buffer the video without starting playback (unless autoplay is also set). */
   preload?: boolean;
+  /** Replay the same source indefinitely. When true, `onEnd` is not called. */
+  loop?: boolean;
   onProgress?: (time: number) => void;
   onEnd?: () => void;
   style?: StyleProp<ViewStyle>;
