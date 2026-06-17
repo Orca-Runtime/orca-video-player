@@ -160,11 +160,18 @@ jobs:
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
 
+      - name: Setup Ruby
+        if: env.turbo_cache_hit != 1
+        uses: ruby/setup-ruby@89f90524b88a01fe6e0b732220432cc6142926af # v1.313.0
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: example
+
       - name: Install cocoapods
-        if: env.turbo_cache_hit != 1 && steps.cocoapods-cache.outputs.cache-hit != 'true'
+        if: env.turbo_cache_hit != 1
+        working-directory: example
         run: |
-          cd example
-          bundle install
           bundle exec pod repo update --verbose
           bundle exec pod install --project-directory=ios
 
