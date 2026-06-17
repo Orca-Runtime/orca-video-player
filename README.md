@@ -1,3 +1,10 @@
+![Orca Video Player](./assets/banner.png)
+
+<p align="center">
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="license MIT" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/lib-React%20Native%20CLI-blue.svg" alt="lib React Native CLI" /></a>
+</p>
+
 # orca-video-player
 
 React Native video player with disk caching, preloading, and multi-URI support. Built on [Nitro Modules](https://nitro.margelo.com/).
