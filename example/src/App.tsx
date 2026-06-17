@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { OrcaVideoPlayer, useVideoCache } from 'orca-video-player';
+import {
+  OrcaVideoPlayer,
+  useVideoCache,
+} from '@orca-runtime/orca-video-player';
 
 const SAMPLE_VIDEO_URIS = [
   'https://www.w3schools.com/tags/mov_bbb.mp4',

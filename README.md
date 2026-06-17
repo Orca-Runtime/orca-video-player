@@ -1,6 +1,7 @@
 ![Orca Video Player](./assets/banner.png)
 
 <p align="center">
+  <a href="https://www.npmjs.com/package/@orca-runtime/orca-video-player"><img src="https://img.shields.io/npm/v/@orca-runtime/orca-video-player?label=npm" alt="npm version" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="license MIT" /></a>
   <a href="https://github.com/Orca-Runtime/orca-video-player/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Orca-Runtime/orca-video-player/ci.yml?branch=main&label=build" alt="build status" /></a>
   <a href="#"><img src="https://img.shields.io/badge/lib-React%20Native%20CLI-blue.svg" alt="lib React Native CLI" /></a>
@@ -9,7 +10,7 @@
 
 # @orca-runtime/orca-video-player
 
-React Native video player with disk caching, preloading, and multi-URI support. Built on [Nitro Modules](https://nitro.margelo.com/).
+React Native video player with disk caching, preloading, and multi-URI support. Published on npm under the [`@orca-runtime`](https://www.npmjs.com/org/orca-runtime) scope. Built on [Nitro Modules](https://nitro.margelo.com/).
 
 ## Installation
 
@@ -17,13 +18,44 @@ React Native video player with disk caching, preloading, and multi-URI support. 
 npm install @orca-runtime/orca-video-player react-native-nitro-modules
 ```
 
-> `react-native-nitro-modules` is required.
+```sh
+yarn add @orca-runtime/orca-video-player react-native-nitro-modules
+```
+
+```sh
+pnpm add @orca-runtime/orca-video-player react-native-nitro-modules
+```
+
+> `react-native-nitro-modules` is a required peer dependency.
 
 After installing or changing native code, run:
 
 ```sh
 yarn nitrogen   # first time / after *.nitro.ts changes
 cd ios && pod install
+```
+
+## Package exports
+
+All public APIs are imported from `@orca-runtime/orca-video-player`:
+
+```tsx
+import {
+  OrcaVideoPlayer,
+  OrcaVideoPlayerCacheApi,
+  useVideoCache,
+  getVideoUris,
+  resolveVideoSource,
+} from '@orca-runtime/orca-video-player';
+
+import type {
+  OrcaVideoPlayerProps,
+  VideoSource,
+  ResizeMode,
+  ResolvedVideoSource,
+  UseVideoCacheOptions,
+  UseVideoCacheResult,
+} from '@orca-runtime/orca-video-player';
 ```
 
 ## Quick start

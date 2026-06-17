@@ -2832,7 +2832,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@orca-runtime/orca-video-player@workspace:.":
+"@orca-runtime/orca-video-player@workspace:*, @orca-runtime/orca-video-player@workspace:.":
   version: 0.0.0-use.local
   resolution: "@orca-runtime/orca-video-player@workspace:."
   dependencies:
@@ -9690,6 +9690,7 @@ __metadata:
     "@babel/core": "npm:^7.25.2"
     "@babel/preset-env": "npm:^7.25.3"
     "@babel/runtime": "npm:^7.25.0"
+    "@orca-runtime/orca-video-player": "workspace:*"
     "@react-native-community/cli": "npm:20.1.0"
     "@react-native-community/cli-platform-android": "npm:20.1.0"
     "@react-native-community/cli-platform-ios": "npm:20.1.0"
