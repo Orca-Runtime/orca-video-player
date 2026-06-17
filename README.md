@@ -35,6 +35,10 @@ yarn nitrogen   # first time / after *.nitro.ts changes
 cd ios && pod install
 ```
 
+<p align="center">
+  <img src="./assets/orca-gif.gif" alt="Orca Video Player comparison" width="100%" />
+</p>
+
 ## Package exports
 
 All public APIs are imported from `@orca-runtime/orca-video-player`:
