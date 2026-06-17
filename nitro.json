@@ -1,0 +1,23 @@
+{
+  "cxxNamespace": ["orcavideoplayer"],
+  "ios": {
+    "iosModuleName": "OrcaVideoPlayer"
+  },
+  "android": {
+    "androidNamespace": ["orcavideoplayer"],
+    "androidCxxLibName": "orcavideoplayer"
+  },
+  "autolinking": {
+    "OrcaVideoPlayer": {
+      "ios": {
+        "language": "swift",
+        "implementationClassName": "OrcaVideoPlayer"
+      },
+      "android": {
+        "language": "kotlin",
+        "implementationClassName": "OrcaVideoPlayer"
+      }
+    }
+  },
+  "ignorePaths": ["node_modules"]
+}
