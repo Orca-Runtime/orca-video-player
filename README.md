@@ -7,14 +7,14 @@
   <a href="https://www.patreon.com/cw/orcaruntime"><img src="https://img.shields.io/badge/support-Patreon-FF424D?logo=patreon&logoColor=white" alt="support on Patreon" /></a>
 </p>
 
-# orca-video-player
+# @orca-runtime/orca-video-player
 
 React Native video player with disk caching, preloading, and multi-URI support. Built on [Nitro Modules](https://nitro.margelo.com/).
 
 ## Installation
 
 ```sh
-npm install orca-video-player react-native-nitro-modules
+npm install @orca-runtime/orca-video-player react-native-nitro-modules
 ```
 
 > `react-native-nitro-modules` is required.
@@ -29,7 +29,7 @@ cd ios && pod install
 ## Quick start
 
 ```tsx
-import { OrcaVideoPlayer } from 'orca-video-player';
+import { OrcaVideoPlayer } from '@orca-runtime/orca-video-player';
 
 <OrcaVideoPlayer
   source={{ uri: 'https://example.com/video.mp4' }}
@@ -73,7 +73,7 @@ Pass an array of remote URLs and select which one to play with `uriIndex`:
 
 ```tsx
 import { useState } from 'react';
-import { OrcaVideoPlayer } from 'orca-video-player';
+import { OrcaVideoPlayer } from '@orca-runtime/orca-video-player';
 
 const VIDEOS = [
   'https://example.com/video-a.mp4',
@@ -137,7 +137,7 @@ Prepares the native player and buffers media without starting playback:
 `OrcaVideoPlayerCacheApi` is a global native singleton. It downloads videos to the device cache directory and resolves them to a local `file://` URI.
 
 ```tsx
-import { OrcaVideoPlayerCacheApi } from 'orca-video-player';
+import { OrcaVideoPlayerCacheApi } from '@orca-runtime/orca-video-player';
 
 // Download one video
 await OrcaVideoPlayerCacheApi.preload({
@@ -183,7 +183,7 @@ const cachedUri = OrcaVideoPlayerCacheApi.getCachedUri(remoteUri);
 React hook that wraps the disk cache API and returns a resolved `source` for `OrcaVideoPlayer`.
 
 ```tsx
-import { OrcaVideoPlayer, useVideoCache } from 'orca-video-player';
+import { OrcaVideoPlayer, useVideoCache } from '@orca-runtime/orca-video-player';
 
 const { source, isCached, isPreloading, preload, clearCache } = useVideoCache(
   { uri: 'https://example.com/video.mp4' },
@@ -223,7 +223,7 @@ const { source, isCached, isPreloading, preload, clearCache } = useVideoCache(
 
 ```tsx
 import { useState } from 'react';
-import { OrcaVideoPlayer, useVideoCache } from 'orca-video-player';
+import { OrcaVideoPlayer, useVideoCache } from '@orca-runtime/orca-video-player';
 
 const [uriIndex, setUriIndex] = useState(0);
 
@@ -253,7 +253,7 @@ Recommended pattern for feed / detail flows:
 ```tsx
 // Root layout / app bootstrap
 import { useEffect } from 'react';
-import { OrcaVideoPlayerCacheApi } from 'orca-video-player';
+import { OrcaVideoPlayerCacheApi } from '@orca-runtime/orca-video-player';
 
 const FEED_VIDEOS = [
   'https://example.com/video-a.mp4',
@@ -271,7 +271,7 @@ export function AppBootstrap() {
 
 ```tsx
 // Player screen (different route)
-import { OrcaVideoPlayer, useVideoCache } from 'orca-video-player';
+import { OrcaVideoPlayer, useVideoCache } from '@orca-runtime/orca-video-player';
 
 export function PlayerScreen({ remoteUri }: { remoteUri: string }) {
   const { source } = useVideoCache(
@@ -288,7 +288,7 @@ export function PlayerScreen({ remoteUri }: { remoteUri: string }) {
 ## Utility helpers
 
 ```tsx
-import { getVideoUris, resolveVideoSource } from 'orca-video-player';
+import { getVideoUris, resolveVideoSource } from '@orca-runtime/orca-video-player';
 
 getVideoUris(['https://a.mp4', 'https://b.mp4']);
 // → ['https://a.mp4', 'https://b.mp4']
