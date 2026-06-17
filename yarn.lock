@@ -2832,6 +2832,45 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@orca-runtime/orca-video-player@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@orca-runtime/orca-video-player@workspace:."
+  dependencies:
+    "@commitlint/config-conventional": "npm:^21.0.2"
+    "@eslint/compat": "npm:^2.1.0"
+    "@eslint/eslintrc": "npm:^3.3.5"
+    "@eslint/js": "npm:^10.0.1"
+    "@jest/globals": "npm:^29.7.0"
+    "@react-native/babel-preset": "npm:0.85.0"
+    "@react-native/eslint-config": "npm:0.85.0"
+    "@react-native/jest-preset": "npm:0.85.0"
+    "@release-it/conventional-changelog": "npm:^11.0.1"
+    "@types/react": "npm:^19.2.0"
+    commitlint: "npm:^21.0.2"
+    del-cli: "npm:^7.0.0"
+    eslint: "npm:^9.39.4"
+    eslint-config-prettier: "npm:^10.1.8"
+    eslint-plugin-ft-flow: "npm:^3.0.11"
+    eslint-plugin-prettier: "npm:^5.5.6"
+    jest: "npm:^29.7.0"
+    lefthook: "npm:^2.1.9"
+    nitrogen: "npm:^0.35.9"
+    prettier: "npm:^3.8.3"
+    react: "npm:19.2.3"
+    react-native: "npm:0.85.0"
+    react-native-builder-bob: "npm:^0.43.0"
+    react-native-nitro-modules: "npm:^0.35.9"
+    react-native-web: "npm:~0.21.2"
+    release-it: "npm:^20.2.0"
+    turbo: "npm:^2.9.16"
+    typescript: "npm:^6.0.3"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-nitro-modules: ^0.35.9
+  languageName: unknown
+  linkType: soft
+
 "@phun-ky/typeof@npm:2.0.3":
   version: 2.0.3
   resolution: "@phun-ky/typeof@npm:2.0.3"
@@ -9669,45 +9708,6 @@ __metadata:
     react-native-web: "npm:~0.21.2"
     vite: "npm:^7.1.1"
     vite-plugin-commonjs: "npm:^0.10.4"
-  languageName: unknown
-  linkType: soft
-
-"orca-video-player@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "orca-video-player@workspace:."
-  dependencies:
-    "@commitlint/config-conventional": "npm:^21.0.2"
-    "@eslint/compat": "npm:^2.1.0"
-    "@eslint/eslintrc": "npm:^3.3.5"
-    "@eslint/js": "npm:^10.0.1"
-    "@jest/globals": "npm:^29.7.0"
-    "@react-native/babel-preset": "npm:0.85.0"
-    "@react-native/eslint-config": "npm:0.85.0"
-    "@react-native/jest-preset": "npm:0.85.0"
-    "@release-it/conventional-changelog": "npm:^11.0.1"
-    "@types/react": "npm:^19.2.0"
-    commitlint: "npm:^21.0.2"
-    del-cli: "npm:^7.0.0"
-    eslint: "npm:^9.39.4"
-    eslint-config-prettier: "npm:^10.1.8"
-    eslint-plugin-ft-flow: "npm:^3.0.11"
-    eslint-plugin-prettier: "npm:^5.5.6"
-    jest: "npm:^29.7.0"
-    lefthook: "npm:^2.1.9"
-    nitrogen: "npm:^0.35.9"
-    prettier: "npm:^3.8.3"
-    react: "npm:19.2.3"
-    react-native: "npm:0.85.0"
-    react-native-builder-bob: "npm:^0.43.0"
-    react-native-nitro-modules: "npm:^0.35.9"
-    react-native-web: "npm:~0.21.2"
-    release-it: "npm:^20.2.0"
-    turbo: "npm:^2.9.16"
-    typescript: "npm:^6.0.3"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-    react-native-nitro-modules: ^0.35.9
   languageName: unknown
   linkType: soft
 
