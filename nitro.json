@@ -8,14 +8,24 @@
     "androidCxxLibName": "orcavideoplayer"
   },
   "autolinking": {
-    "OrcaVideoPlayer": {
+    "OrcaVideoPlayerCache": {
       "ios": {
         "language": "swift",
-        "implementationClassName": "OrcaVideoPlayer"
+        "implementationClassName": "HybridOrcaVideoPlayerCache"
       },
       "android": {
         "language": "kotlin",
-        "implementationClassName": "OrcaVideoPlayer"
+        "implementationClassName": "HybridOrcaVideoPlayerCache"
+      }
+    },
+    "OrcaVideoPlayerView": {
+      "ios": {
+        "language": "swift",
+        "implementationClassName": "HybridOrcaVideoPlayerView"
+      },
+      "android": {
+        "language": "kotlin",
+        "implementationClassName": "HybridOrcaVideoPlayerView"
       }
     }
   },
