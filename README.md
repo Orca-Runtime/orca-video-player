@@ -2,7 +2,9 @@
 
 <p align="center">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="license MIT" /></a>
+  <a href="https://github.com/Orca-Runtime/orca-video-player/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Orca-Runtime/orca-video-player/ci.yml?branch=main&label=build" alt="build status" /></a>
   <a href="#"><img src="https://img.shields.io/badge/lib-React%20Native%20CLI-blue.svg" alt="lib React Native CLI" /></a>
+  <a href="https://www.patreon.com/cw/orcaruntime"><img src="https://img.shields.io/badge/support-Patreon-FF424D?logo=patreon&logoColor=white" alt="support on Patreon" /></a>
 </p>
 
 # orca-video-player
@@ -305,6 +307,10 @@ resolveVideoSource({ uri: ['https://a.mp4', 'https://b.mp4'] }, 1);
 - **Web**: Cache uses in-memory blob URLs (not persisted across page reloads).
 - Cache may be evicted by the OS at any time. Always fall back to the remote URI.
 - Authenticated URLs (`headers`) are not yet supported by the native disk cache downloader.
+
+## Support
+
+If you find this library useful, you can support [Orca Runtime on Patreon](https://www.patreon.com/cw/orcaruntime).
 
 ## Contributing
 
