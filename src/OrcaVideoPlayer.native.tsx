@@ -36,8 +36,11 @@ export const OrcaVideoPlayer = forwardRef<
     resizeMode = 'contain',
     preload = false,
     loop = false,
+    allowsPictureInPicture = false,
+    autoEnterPictureInPicture = false,
     onProgress,
     onEnd,
+    onPictureInPictureChange,
     style,
   },
   ref
@@ -56,6 +59,12 @@ export const OrcaVideoPlayer = forwardRef<
       seekTo(seconds) {
         nativeRef.current?.seekTo(seconds);
       },
+      enterPictureInPicture() {
+        nativeRef.current?.enterPictureInPicture();
+      },
+      exitPictureInPicture() {
+        nativeRef.current?.exitPictureInPicture();
+      },
     }),
     []
   );
@@ -71,8 +80,11 @@ export const OrcaVideoPlayer = forwardRef<
     resizeMode,
     preload,
     loop,
+    allowsPictureInPicture,
+    autoEnterPictureInPicture,
     onProgress: callback(onProgress ?? noop),
     onEnd: callback(onEnd ?? noop),
+    onPictureInPictureChange: callback(onPictureInPictureChange ?? noop),
     hybridRef: callback((instance: OrcaVideoPlayerView) => {
       nativeRef.current = instance;
     }),

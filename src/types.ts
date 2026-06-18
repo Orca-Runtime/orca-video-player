@@ -6,6 +6,8 @@ export interface OrcaVideoPlayerHandle {
   play(): void;
   pause(): void;
   seekTo(seconds: number): void;
+  enterPictureInPicture(): void;
+  exitPictureInPicture(): void;
 }
 
 export interface VideoSource {
@@ -26,7 +28,12 @@ export interface OrcaVideoPlayerProps {
   preload?: boolean;
   /** Replay the same source indefinitely. When true, `onEnd` is not called. */
   loop?: boolean;
+  /** Enable Picture-in-Picture support. */
+  allowsPictureInPicture?: boolean;
+  /** Automatically enter PiP when the app moves to the background. */
+  autoEnterPictureInPicture?: boolean;
   onProgress?: (time: number) => void;
   onEnd?: () => void;
+  onPictureInPictureChange?: (active: boolean) => void;
   style?: StyleProp<ViewStyle>;
 }

@@ -1,5 +1,7 @@
 package com.margelo.nitro.orcavideoplayer
 
+import android.app.Activity
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -20,13 +22,17 @@ class HybridOrcaVideoPlayerView(
   override var resizeMode: ResizeMode = ResizeMode.CONTAIN
   override var preload: Boolean = false
   override var loop: Boolean = false
+  override var allowsPictureInPicture: Boolean = false
+  override var autoEnterPictureInPicture: Boolean = false
   override var onProgress: (time: Double) -> Unit = {}
   override var onEnd: () -> Unit = {}
+  override var onPictureInPictureChange: (active: Boolean) -> Unit = {}
 
   private val playerView = PlayerView(context)
   private val player: ExoPlayer = ExoPlayer.Builder(context).build()
   private val progressHandler = Handler(Looper.getMainLooper())
   private var loadedUri: String = ""
+  private var isDestroyed = false
 
   private val progressRunnable =
     object : Runnable {
@@ -65,6 +71,7 @@ class HybridOrcaVideoPlayerView(
     playerView.useController = controls
     playerView.resizeMode = mapResizeMode(resizeMode)
     player.repeatMode = if (loop) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
+    updatePictureInPictureRegistration()
 
     if (autoplay) {
       player.playWhenReady = true
@@ -85,6 +92,43 @@ class HybridOrcaVideoPlayerView(
 
   override fun seekTo(seconds: Double) {
     player.seekTo((seconds * 1000).toLong())
+  }
+
+  override fun enterPictureInPicture() {
+    val activity = context.currentActivity ?: return
+    enterPictureInPictureInternal(activity)
+  }
+
+  override fun exitPictureInPicture() {
+    val activity = context.currentActivity ?: return
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity.isInPictureInPictureMode) {
+      activity.moveTaskToBack(false)
+    }
+  }
+
+  internal fun enterPictureInPictureInternal(activity: Activity) {
+    if (!allowsPictureInPicture || Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      return
+    }
+    OrcaVideoPlayerPipHelper.registerPipView(this)
+    val params = OrcaVideoPlayerPipHelper.buildPictureInPictureParams() ?: return
+    activity.enterPictureInPictureMode(params)
+  }
+
+  internal fun isPlaying(): Boolean {
+    return player.isPlaying
+  }
+
+  internal fun notifyPictureInPictureChange(active: Boolean) {
+    onPictureInPictureChange(active)
+  }
+
+  private fun updatePictureInPictureRegistration() {
+    OrcaVideoPlayerPipHelper.unregisterPipView(this)
+    OrcaVideoPlayerPipHelper.registerPipView(this)
+    if (allowsPictureInPicture && autoEnterPictureInPicture) {
+      OrcaVideoPlayerPipHelper.registerAutoEnterCandidate(this)
+    }
   }
 
   private fun applySourceIfNeeded() {
@@ -113,6 +157,11 @@ class HybridOrcaVideoPlayerView(
   }
 
   private fun cleanup() {
+    if (isDestroyed) {
+      return
+    }
+    isDestroyed = true
+    OrcaVideoPlayerPipHelper.unregisterPipView(this)
     progressHandler.removeCallbacks(progressRunnable)
     player.removeListener(playerListener)
     player.stop()

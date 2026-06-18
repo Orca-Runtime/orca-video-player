@@ -19,10 +19,15 @@ describe('OrcaVideoPlayer', () => {
       muted: true,
       controls: true,
       resizeMode: 'cover',
+      allowsPictureInPicture: true,
+      autoEnterPictureInPicture: true,
       onProgress: (time) => {
         expect(time).toBeGreaterThanOrEqual(0);
       },
       onEnd: () => {},
+      onPictureInPictureChange: (active) => {
+        expect(typeof active).toBe('boolean');
+      },
     };
 
     expect(Array.isArray(props.source.uri)).toBe(true);
@@ -35,6 +40,7 @@ describe('OrcaVideoPlayer', () => {
         <OrcaVideoPlayer
           ref={ref}
           source={{ uri: 'https://example.com/v.mp4' }}
+          allowsPictureInPicture
         />
       );
     });
@@ -43,9 +49,13 @@ describe('OrcaVideoPlayer', () => {
     expect(typeof ref.current?.play).toBe('function');
     expect(typeof ref.current?.pause).toBe('function');
     expect(typeof ref.current?.seekTo).toBe('function');
+    expect(typeof ref.current?.enterPictureInPicture).toBe('function');
+    expect(typeof ref.current?.exitPictureInPicture).toBe('function');
 
     expect(() => ref.current?.play()).not.toThrow();
     expect(() => ref.current?.pause()).not.toThrow();
     expect(() => ref.current?.seekTo(30)).not.toThrow();
+    expect(() => ref.current?.enterPictureInPicture()).not.toThrow();
+    expect(() => ref.current?.exitPictureInPicture()).not.toThrow();
   });
 });

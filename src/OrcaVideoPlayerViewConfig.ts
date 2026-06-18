@@ -13,8 +13,11 @@ const OrcaVideoPlayerViewConfig = {
     resizeMode: true,
     preload: true,
     loop: true,
+    allowsPictureInPicture: true,
+    autoEnterPictureInPicture: true,
     onProgress: true,
     onEnd: true,
+    onPictureInPictureChange: true,
     hybridRef: true,
   },
 } satisfies ViewConfig<Record<string, unknown>>;

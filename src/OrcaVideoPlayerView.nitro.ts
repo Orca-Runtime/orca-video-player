@@ -18,14 +18,19 @@ export interface OrcaVideoPlayerViewProps extends HybridViewProps {
   resizeMode: ResizeMode;
   preload: boolean;
   loop: boolean;
+  allowsPictureInPicture: boolean;
+  autoEnterPictureInPicture: boolean;
   onProgress: (time: number) => void;
   onEnd: () => void;
+  onPictureInPictureChange: (active: boolean) => void;
 }
 
 export interface OrcaVideoPlayerViewMethods extends HybridViewMethods {
   play(): void;
   pause(): void;
   seekTo(seconds: number): void;
+  enterPictureInPicture(): void;
+  exitPictureInPicture(): void;
 }
 
 export type OrcaVideoPlayerView = HybridView<

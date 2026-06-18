@@ -78,9 +78,14 @@ export default function App() {
             autoplay
             muted
             controls
+            allowsPictureInPicture
+            autoEnterPictureInPicture
             resizeMode="cover"
             onProgress={(time) => console.log('preload player', time)}
             onEnd={() => console.log('preload player ended')}
+            onPictureInPictureChange={(active) =>
+              console.log('preload player PiP', active)
+            }
           />
           <View style={styles.controlBar}>
             <Pressable
@@ -101,6 +106,12 @@ export default function App() {
             >
               <Text style={styles.controlButtonText}>Seek to 10s</Text>
             </Pressable>
+            <Pressable
+              style={styles.controlButton}
+              onPress={() => playerRef.current?.enterPictureInPicture()}
+            >
+              <Text style={styles.controlButtonText}>PiP</Text>
+            </Pressable>
           </View>
         </View>
 
@@ -114,6 +125,8 @@ export default function App() {
             autoplay={false}
             muted
             controls
+            allowsPictureInPicture
+            autoEnterPictureInPicture
             resizeMode="cover"
             onProgress={(time) => console.log('no-preload player', time)}
             onEnd={() => console.log('no-preload player ended')}
@@ -128,6 +141,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+    marginTop: 48,
   },
   toolbar: {
     gap: 12,

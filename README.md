@@ -123,26 +123,103 @@ const playerRef = useRef<OrcaVideoPlayerHandle>(null);
   <Pressable onPress={() => playerRef.current?.seekTo(10)}>
     <Text>Seek to 10s</Text>
   </Pressable>
+  <Pressable onPress={() => playerRef.current?.enterPictureInPicture()}>
+    <Text>PiP</Text>
+  </Pressable>
 </>;
 ```
 
 #### Ref methods
 
-| Method            | Description                   |
-| ----------------- | ----------------------------- |
-| `play()`          | Start or resume playback      |
-| `pause()`         | Pause playback                |
-| `seekTo(seconds)` | Seek to a position in seconds |
+| Method                      | Description                   |
+| --------------------------- | ----------------------------- |
+| `play()`                    | Start or resume playback      |
+| `pause()`                   | Pause playback                |
+| `seekTo(seconds)`           | Seek to a position in seconds |
+| `enterPictureInPicture()`   | Enter Picture-in-Picture mode |
+| `exitPictureInPicture()`    | Exit Picture-in-Picture mode  |
 
 ```ts
 interface OrcaVideoPlayerHandle {
   play(): void;
   pause(): void;
   seekTo(seconds: number): void;
+  enterPictureInPicture(): void;
+  exitPictureInPicture(): void;
 }
 ```
 
 > Ref methods are available on iOS, Android, and web. On web, `play()` may be blocked by the browser until the user interacts with the page.
+
+### Picture-in-Picture
+
+Enable PiP on a player and optionally enter it automatically when the app moves to the background:
+
+```tsx
+const playerRef = useRef<OrcaVideoPlayerHandle>(null);
+
+<OrcaVideoPlayer
+  ref={playerRef}
+  source={{ uri: 'https://example.com/video.mp4' }}
+  allowsPictureInPicture
+  autoEnterPictureInPicture
+  onPictureInPictureChange={(active) => console.log('PiP active:', active)}
+/>
+
+<Pressable onPress={() => playerRef.current?.enterPictureInPicture()}>
+  <Text>Enter PiP</Text>
+</Pressable>
+```
+
+#### Platform setup
+
+**iOS** — add background audio mode to your app's `Info.plist`:
+
+```xml
+<key>UIBackgroundModes</key>
+<array>
+  <string>audio</string>
+</array>
+```
+
+When `controls={true}` and `allowsPictureInPicture` is enabled, the system controls may also show a PiP button.
+
+**Android** — PiP requires host app configuration:
+
+1. Enable PiP on your main activity in `AndroidManifest.xml`:
+
+```xml
+<activity
+  android:name=".MainActivity"
+  android:supportsPictureInPicture="true"
+  ...
+/>
+```
+
+2. Forward lifecycle hooks from `MainActivity`:
+
+```kotlin
+import com.margelo.nitro.orcavideoplayer.OrcaVideoPlayerPipHelper
+
+override fun onUserLeaveHint() {
+  OrcaVideoPlayerPipHelper.onUserLeaveHint(this)
+  super.onUserLeaveHint()
+}
+
+override fun onPictureInPictureModeChanged(
+  isInPictureInPictureMode: Boolean,
+  newConfig: Configuration,
+) {
+  super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+  OrcaVideoPlayerPipHelper.onPictureInPictureModeChanged(isInPictureInPictureMode)
+}
+```
+
+`autoEnterPictureInPicture` uses `onUserLeaveHint` to enter PiP when the user leaves the app while video is playing.
+
+**Web** — uses the [Document Picture-in-Picture API](https://developer.mozilla.org/en-US/docs/Web/API/Picture-in-Picture_API). Auto PiP on tab hide works only in browsers that support it; otherwise it is a no-op. User interaction may be required before `enterPictureInPicture()` succeeds.
+
+> PiP is best tested on a physical iOS device. The iOS Simulator has limited PiP support.
 
 ## OrcaVideoPlayer props
 
@@ -155,10 +232,13 @@ interface OrcaVideoPlayerHandle {
 | `controls`   | `boolean`                           | `false`     | Show native playback controls                                                            |
 | `resizeMode` | `'cover' \| 'contain' \| 'stretch'` | `'contain'` | How video fills the view                                                                 |
 | `preload`    | `boolean`                           | `false`     | Buffer the video in the player without starting playback (unless `autoplay` is also set) |
-| `loop`       | `boolean`                           | `false`     | Replay the same source indefinitely. When `true`, `onEnd` is not called                  |
-| `onProgress` | `(time: number) => void`            | —           | Called with current time in seconds                                                      |
-| `onEnd`      | `() => void`                        | —           | Called when playback finishes (not called when `loop` is `true`)                         |
-| `style`      | `StyleProp<ViewStyle>`              | —           | Container style                                                                          |
+| `loop`                       | `boolean`                           | `false`     | Replay the same source indefinitely. When `true`, `onEnd` is not called                  |
+| `allowsPictureInPicture`     | `boolean`                           | `false`     | Enable Picture-in-Picture support                                                        |
+| `autoEnterPictureInPicture`  | `boolean`                           | `false`     | Enter PiP automatically when the app moves to the background (requires platform setup)   |
+| `onProgress`                 | `(time: number) => void`            | —           | Called with current time in seconds                                                      |
+| `onEnd`                        | `() => void`                        | —           | Called when playback finishes (not called when `loop` is `true`)                         |
+| `onPictureInPictureChange`   | `(active: boolean) => void`         | —           | Called when PiP mode starts or stops                                                     |
+| `style`                        | `StyleProp<ViewStyle>`              | —           | Container style                                                                          |
 
 ### VideoSource
 

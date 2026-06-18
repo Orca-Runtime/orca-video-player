@@ -1,9 +1,11 @@
 package orcavideoplayer.example
 
+import android.content.res.Configuration
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
+import com.margelo.nitro.orcavideoplayer.OrcaVideoPlayerPipHelper
 
 class MainActivity : ReactActivity() {
 
@@ -19,4 +21,17 @@ class MainActivity : ReactActivity() {
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+
+  override fun onUserLeaveHint() {
+    OrcaVideoPlayerPipHelper.onUserLeaveHint(this)
+    super.onUserLeaveHint()
+  }
+
+  override fun onPictureInPictureModeChanged(
+    isInPictureInPictureMode: Boolean,
+    newConfig: Configuration,
+  ) {
+    super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+    OrcaVideoPlayerPipHelper.onPictureInPictureModeChanged(isInPictureInPictureMode)
+  }
 }

@@ -20,7 +20,27 @@ type VideoElement = {
   pause: () => void;
   currentTime: number;
   preload: string;
+  paused: boolean;
+  ended: boolean;
+  requestPictureInPicture: () => Promise<void>;
+  addEventListener: (type: string, listener: () => void) => void;
+  removeEventListener: (type: string, listener: () => void) => void;
 };
+
+type BrowserDocument = {
+  pictureInPictureEnabled: boolean;
+  pictureInPictureElement: VideoElement | null;
+  visibilityState: string;
+  exitPictureInPicture: () => Promise<void>;
+  addEventListener: (type: string, listener: () => void) => void;
+  removeEventListener: (type: string, listener: () => void) => void;
+};
+
+function getBrowserDocument(): BrowserDocument | undefined {
+  const globalDocument = (globalThis as { document?: BrowserDocument })
+    .document;
+  return globalDocument;
+}
 
 function mapObjectFit(resizeMode: ResizeMode): string {
   switch (resizeMode) {
@@ -31,6 +51,11 @@ function mapObjectFit(resizeMode: ResizeMode): string {
     case 'stretch':
       return 'fill';
   }
+}
+
+function isPictureInPictureSupported(): boolean {
+  const browserDocument = getBrowserDocument();
+  return browserDocument != null && browserDocument.pictureInPictureEnabled;
 }
 
 export const OrcaVideoPlayer = forwardRef<
@@ -46,14 +71,22 @@ export const OrcaVideoPlayer = forwardRef<
     resizeMode = 'contain',
     preload = false,
     loop = false,
+    allowsPictureInPicture = false,
+    autoEnterPictureInPicture = false,
     onProgress,
     onEnd,
+    onPictureInPictureChange,
     style,
   },
   ref
 ) {
   const resolvedSource = resolveVideoSource(source, uriIndex);
   const videoRef = useRef<VideoElement | null>(null);
+  const onPictureInPictureChangeRef = useRef(onPictureInPictureChange);
+
+  useEffect(() => {
+    onPictureInPictureChangeRef.current = onPictureInPictureChange;
+  }, [onPictureInPictureChange]);
 
   useImperativeHandle(
     ref,
@@ -69,8 +102,25 @@ export const OrcaVideoPlayer = forwardRef<
           videoRef.current.currentTime = seconds;
         }
       },
+      enterPictureInPicture() {
+        const video = videoRef.current;
+        if (
+          !allowsPictureInPicture ||
+          !video ||
+          !isPictureInPictureSupported()
+        ) {
+          return;
+        }
+        video.requestPictureInPicture().catch(() => {});
+      },
+      exitPictureInPicture() {
+        const browserDocument = getBrowserDocument();
+        if (browserDocument?.pictureInPictureElement) {
+          browserDocument.exitPictureInPicture().catch(() => {});
+        }
+      },
     }),
-    []
+    [allowsPictureInPicture]
   );
 
   useEffect(() => {
@@ -88,6 +138,66 @@ export const OrcaVideoPlayer = forwardRef<
       video.preload = 'auto';
     }
   }, [autoplay, preload, resolvedSource.uri]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    const handleEnter = () => {
+      onPictureInPictureChangeRef.current?.(true);
+    };
+    const handleLeave = () => {
+      onPictureInPictureChangeRef.current?.(false);
+    };
+
+    video.addEventListener('enterpictureinpicture', handleEnter);
+    video.addEventListener('leavepictureinpicture', handleLeave);
+
+    return () => {
+      video.removeEventListener('enterpictureinpicture', handleEnter);
+      video.removeEventListener('leavepictureinpicture', handleLeave);
+    };
+  }, [resolvedSource.uri]);
+
+  useEffect(() => {
+    const browserDocument = getBrowserDocument();
+    if (
+      browserDocument == null ||
+      !allowsPictureInPicture ||
+      !autoEnterPictureInPicture
+    ) {
+      return;
+    }
+
+    const handleVisibilityChange = () => {
+      const video = videoRef.current;
+      if (
+        browserDocument.visibilityState !== 'hidden' ||
+        !video ||
+        !isPictureInPictureSupported() ||
+        browserDocument.pictureInPictureElement === video
+      ) {
+        return;
+      }
+
+      if (!video.paused && !video.ended) {
+        video.requestPictureInPicture().catch(() => {});
+      }
+    };
+
+    browserDocument.addEventListener(
+      'visibilitychange',
+      handleVisibilityChange
+    );
+    return () => {
+      browserDocument.removeEventListener(
+        'visibilitychange',
+        handleVisibilityChange
+      );
+    };
+  }, [allowsPictureInPicture, autoEnterPictureInPicture, resolvedSource.uri]);
 
   return (
     <View style={[styles.container, style]}>
