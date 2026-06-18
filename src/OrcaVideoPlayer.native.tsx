@@ -1,13 +1,21 @@
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import type { ComponentProps } from 'react';
 import { callback, getHostComponent } from 'react-native-nitro-modules';
-import type { OrcaVideoPlayerProps } from './types';
+import type { OrcaVideoPlayerProps, OrcaVideoPlayerHandle } from './types';
 import { resolveVideoSource } from './videoSource';
 import OrcaVideoPlayerViewConfig from './OrcaVideoPlayerViewConfig';
+import type {
+  OrcaVideoPlayerViewProps,
+  OrcaVideoPlayerViewMethods,
+  OrcaVideoPlayerView as NitroOrcaVideoPlayerView,
+} from './OrcaVideoPlayerView.nitro';
 
-const NativeOrcaVideoPlayerView = getHostComponent(
-  'OrcaVideoPlayerView',
-  () => OrcaVideoPlayerViewConfig
-);
+type OrcaVideoPlayerView = NitroOrcaVideoPlayerView;
+
+const NativeOrcaVideoPlayerView = getHostComponent<
+  OrcaVideoPlayerViewProps,
+  OrcaVideoPlayerViewMethods
+>('OrcaVideoPlayerView', () => OrcaVideoPlayerViewConfig as any);
 
 type NativeOrcaVideoPlayerViewProps = ComponentProps<
   typeof NativeOrcaVideoPlayerView
@@ -15,19 +23,43 @@ type NativeOrcaVideoPlayerViewProps = ComponentProps<
 
 const noop = () => {};
 
-export function OrcaVideoPlayer({
-  source,
-  uriIndex = 0,
-  autoplay = false,
-  muted = false,
-  controls = false,
-  resizeMode = 'contain',
-  preload = false,
-  loop = false,
-  onProgress,
-  onEnd,
-  style,
-}: OrcaVideoPlayerProps) {
+export const OrcaVideoPlayer = forwardRef<
+  OrcaVideoPlayerHandle,
+  OrcaVideoPlayerProps
+>(function OrcaVideoPlayerWithRef(
+  {
+    source,
+    uriIndex = 0,
+    autoplay = false,
+    muted = false,
+    controls = false,
+    resizeMode = 'contain',
+    preload = false,
+    loop = false,
+    onProgress,
+    onEnd,
+    style,
+  },
+  ref
+) {
+  const nativeRef = useRef<OrcaVideoPlayerView>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      play() {
+        nativeRef.current?.play();
+      },
+      pause() {
+        nativeRef.current?.pause();
+      },
+      seekTo(seconds) {
+        nativeRef.current?.seekTo(seconds);
+      },
+    }),
+    []
+  );
+
   const resolvedSource = resolveVideoSource(source, uriIndex);
 
   const nativeProps = {
@@ -41,7 +73,10 @@ export function OrcaVideoPlayer({
     loop,
     onProgress: callback(onProgress ?? noop),
     onEnd: callback(onEnd ?? noop),
+    hybridRef: callback((instance: OrcaVideoPlayerView) => {
+      nativeRef.current = instance;
+    }),
   } as NativeOrcaVideoPlayerViewProps;
 
   return <NativeOrcaVideoPlayerView {...nativeProps} />;
-}
+});

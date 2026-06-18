@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
   OrcaVideoPlayer,
   useVideoCache,
 } from '@orca-runtime/orca-video-player';
+import type { OrcaVideoPlayerHandle } from '@orca-runtime/orca-video-player';
 
 const SAMPLE_VIDEO_URIS = [
   'https://www.w3schools.com/tags/mov_bbb.mp4',
@@ -12,6 +13,7 @@ const SAMPLE_VIDEO_URIS = [
 
 export default function App() {
   const [uriIndex, setUriIndex] = useState(0);
+  const playerRef = useRef<OrcaVideoPlayerHandle>(null);
 
   const {
     source,
@@ -67,6 +69,7 @@ export default function App() {
         <View style={styles.playerSection}>
           <Text style={styles.sectionTitle}>With preload (looping)</Text>
           <OrcaVideoPlayer
+            ref={playerRef}
             style={styles.player}
             source={source}
             uriIndex={uriIndex}
@@ -79,6 +82,26 @@ export default function App() {
             onProgress={(time) => console.log('preload player', time)}
             onEnd={() => console.log('preload player ended')}
           />
+          <View style={styles.controlBar}>
+            <Pressable
+              style={styles.controlButton}
+              onPress={() => playerRef.current?.play()}
+            >
+              <Text style={styles.controlButtonText}>Play</Text>
+            </Pressable>
+            <Pressable
+              style={styles.controlButton}
+              onPress={() => playerRef.current?.pause()}
+            >
+              <Text style={styles.controlButtonText}>Pause</Text>
+            </Pressable>
+            <Pressable
+              style={styles.controlButton}
+              onPress={() => playerRef.current?.seekTo(10)}
+            >
+              <Text style={styles.controlButtonText}>Seek to 10s</Text>
+            </Pressable>
+          </View>
         </View>
 
         <View style={styles.playerSection}>
@@ -169,5 +192,25 @@ const styles = StyleSheet.create({
     height: 220,
     borderRadius: 12,
     overflow: 'hidden',
+  },
+  controlBar: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  controlButton: {
+    flex: 1,
+    backgroundColor: '#333',
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#444',
+  },
+  controlButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
