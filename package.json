@@ -1,6 +1,6 @@
 {
   "name": "@orca-runtime/orca-video-player",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "React Native video player with disk caching, preloading, and multi-URI support",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
