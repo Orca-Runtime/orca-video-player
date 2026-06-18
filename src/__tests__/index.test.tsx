@@ -1,11 +1,12 @@
 import { describe, expect, it } from '@jest/globals';
+import * as React from 'react';
+import TestRenderer from 'react-test-renderer';
 import { OrcaVideoPlayer } from '../OrcaVideoPlayer.web';
-import type { OrcaVideoPlayerProps } from '../types';
+import type { OrcaVideoPlayerProps, OrcaVideoPlayerHandle } from '../types';
 
 describe('OrcaVideoPlayer', () => {
   it('exports the component', () => {
     expect(OrcaVideoPlayer).toBeDefined();
-    expect(typeof OrcaVideoPlayer).toBe('function');
   });
 
   it('accepts the public props shape', () => {
@@ -25,5 +26,26 @@ describe('OrcaVideoPlayer', () => {
     };
 
     expect(Array.isArray(props.source.uri)).toBe(true);
+  });
+
+  it('forwards ref methods and calling them does not throw', () => {
+    const ref = React.createRef<OrcaVideoPlayerHandle>();
+    React.act(() => {
+      TestRenderer.create(
+        <OrcaVideoPlayer
+          ref={ref}
+          source={{ uri: 'https://example.com/v.mp4' }}
+        />
+      );
+    });
+
+    expect(ref.current).toBeDefined();
+    expect(typeof ref.current?.play).toBe('function');
+    expect(typeof ref.current?.pause).toBe('function');
+    expect(typeof ref.current?.seekTo).toBe('function');
+
+    expect(() => ref.current?.play()).not.toThrow();
+    expect(() => ref.current?.pause()).not.toThrow();
+    expect(() => ref.current?.seekTo(30)).not.toThrow();
   });
 });
