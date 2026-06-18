@@ -30,17 +30,20 @@ class HybridOrcaVideoPlayerView(
 
   private val playerView = PlayerView(context)
   private val player: ExoPlayer = ExoPlayer.Builder(context).build()
-  private val progressHandler = Handler(Looper.getMainLooper())
+  private val mainHandler = Handler(Looper.getMainLooper())
   private var loadedUri: String = ""
   private var isDestroyed = false
 
   private val progressRunnable =
     object : Runnable {
       override fun run() {
+        if (isDestroyed) {
+          return
+        }
         if (player.playbackState != Player.STATE_IDLE) {
           onProgress(player.currentPosition / 1000.0)
         }
-        progressHandler.postDelayed(this, 250)
+        mainHandler.postDelayed(this, 250)
       }
     }
 
@@ -57,24 +60,31 @@ class HybridOrcaVideoPlayerView(
     get() = playerView
 
   init {
-    playerView.player = player
-    playerView.useController = false
-    player.addListener(playerListener)
-    progressHandler.post(progressRunnable)
+    runOnMainThread {
+      playerView.player = player
+      playerView.useController = false
+      player.addListener(playerListener)
+      mainHandler.post(progressRunnable)
+    }
   }
 
   override fun beforeUpdate() {}
 
   override fun afterUpdate() {
-    applySourceIfNeeded()
-    player.volume = if (muted) 0f else 1f
-    playerView.useController = controls
-    playerView.resizeMode = mapResizeMode(resizeMode)
-    player.repeatMode = if (loop) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
-    updatePictureInPictureRegistration()
+    runOnMainThread {
+      if (isDestroyed) {
+        return@runOnMainThread
+      }
+      applySourceIfNeeded()
+      player.volume = if (muted) 0f else 1f
+      playerView.useController = controls
+      playerView.resizeMode = mapResizeMode(resizeMode)
+      player.repeatMode = if (loop) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
+      updatePictureInPictureRegistration()
 
-    if (autoplay) {
-      player.playWhenReady = true
+      if (autoplay) {
+        player.playWhenReady = true
+      }
     }
   }
 
@@ -83,26 +93,42 @@ class HybridOrcaVideoPlayerView(
   }
 
   override fun play() {
-    player.play()
+    runOnMainThread {
+      if (!isDestroyed) {
+        player.play()
+      }
+    }
   }
 
   override fun pause() {
-    player.pause()
+    runOnMainThread {
+      if (!isDestroyed) {
+        player.pause()
+      }
+    }
   }
 
   override fun seekTo(seconds: Double) {
-    player.seekTo((seconds * 1000).toLong())
+    runOnMainThread {
+      if (!isDestroyed) {
+        player.seekTo((seconds * 1000).toLong())
+      }
+    }
   }
 
   override fun enterPictureInPicture() {
-    val activity = context.currentActivity ?: return
-    enterPictureInPictureInternal(activity)
+    runOnMainThread {
+      val activity = context.currentActivity ?: return@runOnMainThread
+      enterPictureInPictureInternal(activity)
+    }
   }
 
   override fun exitPictureInPicture() {
-    val activity = context.currentActivity ?: return
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity.isInPictureInPictureMode) {
-      activity.moveTaskToBack(false)
+    runOnMainThread {
+      val activity = context.currentActivity ?: return@runOnMainThread
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity.isInPictureInPictureMode) {
+        activity.moveTaskToBack(false)
+      }
     }
   }
 
@@ -121,6 +147,14 @@ class HybridOrcaVideoPlayerView(
 
   internal fun notifyPictureInPictureChange(active: Boolean) {
     onPictureInPictureChange(active)
+  }
+
+  private fun runOnMainThread(action: () -> Unit) {
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+      action()
+    } else {
+      mainHandler.post(action)
+    }
   }
 
   private fun updatePictureInPictureRegistration() {
@@ -157,15 +191,17 @@ class HybridOrcaVideoPlayerView(
   }
 
   private fun cleanup() {
-    if (isDestroyed) {
-      return
+    runOnMainThread {
+      if (isDestroyed) {
+        return@runOnMainThread
+      }
+      isDestroyed = true
+      OrcaVideoPlayerPipHelper.unregisterPipView(this)
+      mainHandler.removeCallbacks(progressRunnable)
+      player.removeListener(playerListener)
+      player.stop()
+      player.release()
+      loadedUri = ""
     }
-    isDestroyed = true
-    OrcaVideoPlayerPipHelper.unregisterPipView(this)
-    progressHandler.removeCallbacks(progressRunnable)
-    player.removeListener(playerListener)
-    player.stop()
-    player.release()
-    loadedUri = ""
   }
 }

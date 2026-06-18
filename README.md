@@ -131,13 +131,13 @@ const playerRef = useRef<OrcaVideoPlayerHandle>(null);
 
 #### Ref methods
 
-| Method                      | Description                   |
-| --------------------------- | ----------------------------- |
-| `play()`                    | Start or resume playback      |
-| `pause()`                   | Pause playback                |
-| `seekTo(seconds)`           | Seek to a position in seconds |
-| `enterPictureInPicture()`   | Enter Picture-in-Picture mode |
-| `exitPictureInPicture()`    | Exit Picture-in-Picture mode  |
+| Method                    | Description                   |
+| ------------------------- | ----------------------------- |
+| `play()`                  | Start or resume playback      |
+| `pause()`                 | Pause playback                |
+| `seekTo(seconds)`         | Seek to a position in seconds |
+| `enterPictureInPicture()` | Enter Picture-in-Picture mode |
+| `exitPictureInPicture()`  | Exit Picture-in-Picture mode  |
 
 ```ts
 interface OrcaVideoPlayerHandle {
@@ -151,7 +151,7 @@ interface OrcaVideoPlayerHandle {
 
 > Ref methods are available on iOS, Android, and web. On web, `play()` may be blocked by the browser until the user interacts with the page.
 
-### Picture-in-Picture
+### Enable Picture-in-Picture
 
 Enable PiP on a player and optionally enter it automatically when the app moves to the background:
 
@@ -223,22 +223,22 @@ override fun onPictureInPictureModeChanged(
 
 ## OrcaVideoPlayer props
 
-| Prop         | Type                                | Default     | Description                                                                              |
-| ------------ | ----------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
-| `source`     | `VideoSource`                       | required    | Video source (single or multiple URIs)                                                   |
-| `uriIndex`   | `number`                            | `0`         | Index into `source.uri` when it is an array                                              |
-| `autoplay`   | `boolean`                           | `false`     | Start playback automatically                                                             |
-| `muted`      | `boolean`                           | `false`     | Mute audio                                                                               |
-| `controls`   | `boolean`                           | `false`     | Show native playback controls                                                            |
-| `resizeMode` | `'cover' \| 'contain' \| 'stretch'` | `'contain'` | How video fills the view                                                                 |
-| `preload`    | `boolean`                           | `false`     | Buffer the video in the player without starting playback (unless `autoplay` is also set) |
-| `loop`                       | `boolean`                           | `false`     | Replay the same source indefinitely. When `true`, `onEnd` is not called                  |
-| `allowsPictureInPicture`     | `boolean`                           | `false`     | Enable Picture-in-Picture support                                                        |
-| `autoEnterPictureInPicture`  | `boolean`                           | `false`     | Enter PiP automatically when the app moves to the background (requires platform setup)   |
-| `onProgress`                 | `(time: number) => void`            | —           | Called with current time in seconds                                                      |
-| `onEnd`                        | `() => void`                        | —           | Called when playback finishes (not called when `loop` is `true`)                         |
-| `onPictureInPictureChange`   | `(active: boolean) => void`         | —           | Called when PiP mode starts or stops                                                     |
-| `style`                        | `StyleProp<ViewStyle>`              | —           | Container style                                                                          |
+| Prop                        | Type                                | Default     | Description                                                                              |
+| --------------------------- | ----------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| `source`                    | `VideoSource`                       | required    | Video source (single or multiple URIs)                                                   |
+| `uriIndex`                  | `number`                            | `0`         | Index into `source.uri` when it is an array                                              |
+| `autoplay`                  | `boolean`                           | `false`     | Start playback automatically                                                             |
+| `muted`                     | `boolean`                           | `false`     | Mute audio                                                                               |
+| `controls`                  | `boolean`                           | `false`     | Show native playback controls                                                            |
+| `resizeMode`                | `'cover' \| 'contain' \| 'stretch'` | `'contain'` | How video fills the view                                                                 |
+| `preload`                   | `boolean`                           | `false`     | Buffer the video in the player without starting playback (unless `autoplay` is also set) |
+| `loop`                      | `boolean`                           | `false`     | Replay the same source indefinitely. When `true`, `onEnd` is not called                  |
+| `allowsPictureInPicture`    | `boolean`                           | `false`     | Enable Picture-in-Picture support                                                        |
+| `autoEnterPictureInPicture` | `boolean`                           | `false`     | Enter PiP automatically when the app moves to the background (requires platform setup)   |
+| `onProgress`                | `(time: number) => void`            | —           | Called with current time in seconds                                                      |
+| `onEnd`                     | `() => void`                        | —           | Called when playback finishes (not called when `loop` is `true`)                         |
+| `onPictureInPictureChange`  | `(active: boolean) => void`         | —           | Called when PiP mode starts or stops                                                     |
+| `style`                     | `StyleProp<ViewStyle>`              | —           | Container style                                                                          |
 
 ### VideoSource
 
