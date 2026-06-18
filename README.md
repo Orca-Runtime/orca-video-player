@@ -54,6 +54,7 @@ import {
 
 import type {
   OrcaVideoPlayerProps,
+  OrcaVideoPlayerHandle,
   VideoSource,
   ResizeMode,
   ResolvedVideoSource,
@@ -91,21 +92,73 @@ Replay the same source indefinitely in a single player instance. When `loop` is 
 />
 ```
 
+### Imperative control
+
+Attach a ref to control playback from your own UI — useful when `controls={false}` and you need custom Play / Pause / Seek buttons:
+
+```tsx
+import { useRef } from 'react';
+import { Pressable, Text } from 'react-native';
+import {
+  OrcaVideoPlayer,
+  type OrcaVideoPlayerHandle,
+} from '@orca-runtime/orca-video-player';
+
+const playerRef = useRef<OrcaVideoPlayerHandle>(null);
+
+<>
+  <OrcaVideoPlayer
+    ref={playerRef}
+    source={{ uri: 'https://example.com/video.mp4' }}
+    controls={false}
+    resizeMode="cover"
+  />
+
+  <Pressable onPress={() => playerRef.current?.play()}>
+    <Text>Play</Text>
+  </Pressable>
+  <Pressable onPress={() => playerRef.current?.pause()}>
+    <Text>Pause</Text>
+  </Pressable>
+  <Pressable onPress={() => playerRef.current?.seekTo(10)}>
+    <Text>Seek to 10s</Text>
+  </Pressable>
+</>;
+```
+
+#### Ref methods
+
+| Method            | Description                   |
+| ----------------- | ----------------------------- |
+| `play()`          | Start or resume playback      |
+| `pause()`         | Pause playback                |
+| `seekTo(seconds)` | Seek to a position in seconds |
+
+```ts
+interface OrcaVideoPlayerHandle {
+  play(): void;
+  pause(): void;
+  seekTo(seconds: number): void;
+}
+```
+
+> Ref methods are available on iOS, Android, and web. On web, `play()` may be blocked by the browser until the user interacts with the page.
+
 ## OrcaVideoPlayer props
 
-| Prop         | Type                                    | Default     | Description |
-| ------------ | --------------------------------------- | ----------- | ----------- |
-| `source`     | `VideoSource`                           | required    | Video source (single or multiple URIs) |
-| `uriIndex`   | `number`                                | `0`         | Index into `source.uri` when it is an array |
-| `autoplay`   | `boolean`                               | `false`     | Start playback automatically |
-| `muted`      | `boolean`                               | `false`     | Mute audio |
-| `controls`   | `boolean`                               | `false`     | Show native playback controls |
-| `resizeMode` | `'cover' \| 'contain' \| 'stretch'`   | `'contain'` | How video fills the view |
-| `preload`    | `boolean`                               | `false`     | Buffer the video in the player without starting playback (unless `autoplay` is also set) |
-| `loop`       | `boolean`                               | `false`     | Replay the same source indefinitely. When `true`, `onEnd` is not called |
-| `onProgress` | `(time: number) => void`                | —           | Called with current time in seconds |
-| `onEnd`      | `() => void`                            | —           | Called when playback finishes (not called when `loop` is `true`) |
-| `style`      | `StyleProp<ViewStyle>`                  | —           | Container style |
+| Prop         | Type                                | Default     | Description                                                                              |
+| ------------ | ----------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| `source`     | `VideoSource`                       | required    | Video source (single or multiple URIs)                                                   |
+| `uriIndex`   | `number`                            | `0`         | Index into `source.uri` when it is an array                                              |
+| `autoplay`   | `boolean`                           | `false`     | Start playback automatically                                                             |
+| `muted`      | `boolean`                           | `false`     | Mute audio                                                                               |
+| `controls`   | `boolean`                           | `false`     | Show native playback controls                                                            |
+| `resizeMode` | `'cover' \| 'contain' \| 'stretch'` | `'contain'` | How video fills the view                                                                 |
+| `preload`    | `boolean`                           | `false`     | Buffer the video in the player without starting playback (unless `autoplay` is also set) |
+| `loop`       | `boolean`                           | `false`     | Replay the same source indefinitely. When `true`, `onEnd` is not called                  |
+| `onProgress` | `(time: number) => void`            | —           | Called with current time in seconds                                                      |
+| `onEnd`      | `() => void`                        | —           | Called when playback finishes (not called when `loop` is `true`)                         |
+| `style`      | `StyleProp<ViewStyle>`              | —           | Container style                                                                          |
 
 ### VideoSource
 
@@ -144,10 +197,10 @@ const [index, setIndex] = useState(0);
 
 There are two different preload mechanisms:
 
-| Mechanism          | API                                      | Scope                              | Use case |
-| ------------------ | ---------------------------------------- | ---------------------------------- | -------- |
-| **Player preload** | `OrcaVideoPlayer` `preload` prop         | In-memory, tied to mounted player  | Buffer early on the same screen |
-| **Disk cache**     | `OrcaVideoPlayerCacheApi` / `useVideoCache` | Persistent on device, global    | Preload at app start, play on another screen |
+| Mechanism          | API                                         | Scope                             | Use case                                     |
+| ------------------ | ------------------------------------------- | --------------------------------- | -------------------------------------------- |
+| **Player preload** | `OrcaVideoPlayer` `preload` prop            | In-memory, tied to mounted player | Buffer early on the same screen              |
+| **Disk cache**     | `OrcaVideoPlayerCacheApi` / `useVideoCache` | Persistent on device, global      | Preload at app start, play on another screen |
 
 ### Player preload (in-memory)
 
@@ -159,7 +212,7 @@ Prepares the native player and buffers media without starting playback:
   preload
   autoplay={false}
   controls
-/>;
+/>
 ```
 
 > When the player unmounts, this buffer is released. For cross-screen preloading, use the disk cache API below.
@@ -196,10 +249,7 @@ await OrcaVideoPlayerCacheApi.preload({
 
 // Download multiple videos
 await OrcaVideoPlayerCacheApi.preload({
-  uri: [
-    'https://example.com/video-a.mp4',
-    'https://example.com/video-b.mp4',
-  ],
+  uri: ['https://example.com/video-a.mp4', 'https://example.com/video-b.mp4'],
 });
 
 // Check cache status
@@ -221,11 +271,7 @@ await OrcaVideoPlayerCacheApi.clearAllCache();
 const remoteUri = 'https://example.com/video.mp4';
 const cachedUri = OrcaVideoPlayerCacheApi.getCachedUri(remoteUri);
 
-<OrcaVideoPlayer
-  source={{ uri: cachedUri ?? remoteUri }}
-  autoplay
-  controls
-/>;
+<OrcaVideoPlayer source={{ uri: cachedUri ?? remoteUri }} autoplay controls />;
 ```
 
 ## useVideoCache hook
@@ -233,14 +279,17 @@ const cachedUri = OrcaVideoPlayerCacheApi.getCachedUri(remoteUri);
 React hook that wraps the disk cache API and returns a resolved `source` for `OrcaVideoPlayer`.
 
 ```tsx
-import { OrcaVideoPlayer, useVideoCache } from '@orca-runtime/orca-video-player';
+import {
+  OrcaVideoPlayer,
+  useVideoCache,
+} from '@orca-runtime/orca-video-player';
 
 const { source, isCached, isPreloading, preload, clearCache } = useVideoCache(
   { uri: 'https://example.com/video.mp4' },
   {
     autoPreload: false, // download on mount
-    preferCache: true,  // use local file URI when available
-    uriIndex: 0,        // active URI when uri is an array
+    preferCache: true, // use local file URI when available
+    uriIndex: 0, // active URI when uri is an array
   }
 );
 
@@ -249,31 +298,34 @@ const { source, isCached, isPreloading, preload, clearCache } = useVideoCache(
 
 ### Hook options
 
-| Option        | Type      | Default | Description |
-| ------------- | --------- | ------- | ----------- |
-| `autoPreload` | `boolean` | `false` | Download to disk when the hook mounts |
+| Option        | Type      | Default | Description                                |
+| ------------- | --------- | ------- | ------------------------------------------ |
+| `autoPreload` | `boolean` | `false` | Download to disk when the hook mounts      |
 | `preferCache` | `boolean` | `true`  | Resolve `source.uri` to a cached local URI |
-| `uriIndex`    | `number`  | `0`     | Active URI when `source.uri` is an array |
+| `uriIndex`    | `number`  | `0`     | Active URI when `source.uri` is an array   |
 
 ### Hook return value
 
-| Field          | Type                      | Description |
-| -------------- | ------------------------- | ----------- |
+| Field          | Type                      | Description                             |
+| -------------- | ------------------------- | --------------------------------------- |
 | `source`       | `VideoSource`             | Resolved source (local URI when cached) |
-| `uris`         | `string[]`                | All remote URIs |
-| `activeUri`    | `string`                  | Currently selected remote URI |
-| `isCached`     | `boolean`                 | `true` when all URIs are cached |
-| `cachedByUri`  | `Record<string, boolean>` | Per-URI cache status |
-| `isPreloading` | `boolean`                 | Download in progress |
-| `error`        | `Error \| null`           | Last preload error |
-| `preload`      | `() => Promise<void>`     | Manually trigger download |
-| `clearCache`   | `() => Promise<void>`     | Clear cache for all URIs in the source |
+| `uris`         | `string[]`                | All remote URIs                         |
+| `activeUri`    | `string`                  | Currently selected remote URI           |
+| `isCached`     | `boolean`                 | `true` when all URIs are cached         |
+| `cachedByUri`  | `Record<string, boolean>` | Per-URI cache status                    |
+| `isPreloading` | `boolean`                 | Download in progress                    |
+| `error`        | `Error \| null`           | Last preload error                      |
+| `preload`      | `() => Promise<void>`     | Manually trigger download               |
+| `clearCache`   | `() => Promise<void>`     | Clear cache for all URIs in the source  |
 
 ### Multiple URIs with the hook
 
 ```tsx
 import { useState } from 'react';
-import { OrcaVideoPlayer, useVideoCache } from '@orca-runtime/orca-video-player';
+import {
+  OrcaVideoPlayer,
+  useVideoCache,
+} from '@orca-runtime/orca-video-player';
 
 const [uriIndex, setUriIndex] = useState(0);
 
@@ -321,13 +373,13 @@ export function AppBootstrap() {
 
 ```tsx
 // Player screen (different route)
-import { OrcaVideoPlayer, useVideoCache } from '@orca-runtime/orca-video-player';
+import {
+  OrcaVideoPlayer,
+  useVideoCache,
+} from '@orca-runtime/orca-video-player';
 
 export function PlayerScreen({ remoteUri }: { remoteUri: string }) {
-  const { source } = useVideoCache(
-    { uri: remoteUri },
-    { preferCache: true }
-  );
+  const { source } = useVideoCache({ uri: remoteUri }, { preferCache: true });
 
   return <OrcaVideoPlayer source={source} autoplay controls />;
 }
@@ -338,7 +390,10 @@ export function PlayerScreen({ remoteUri }: { remoteUri: string }) {
 ## Utility helpers
 
 ```tsx
-import { getVideoUris, resolveVideoSource } from '@orca-runtime/orca-video-player';
+import {
+  getVideoUris,
+  resolveVideoSource,
+} from '@orca-runtime/orca-video-player';
 
 getVideoUris(['https://a.mp4', 'https://b.mp4']);
 // → ['https://a.mp4', 'https://b.mp4']
