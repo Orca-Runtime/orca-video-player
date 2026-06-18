@@ -1,12 +1,23 @@
-import { createElement, useEffect, useRef } from 'react';
+import {
+  createElement,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import { StyleSheet, View } from 'react-native';
-import type { OrcaVideoPlayerProps, ResizeMode } from './types';
+import type {
+  OrcaVideoPlayerProps,
+  ResizeMode,
+  OrcaVideoPlayerHandle,
+} from './types';
 import { resolveVideoSource } from './videoSource';
 
 type VideoElement = {
   src: string;
   load: () => void;
   play: () => Promise<void>;
+  pause: () => void;
   currentTime: number;
   preload: string;
 };
@@ -22,21 +33,45 @@ function mapObjectFit(resizeMode: ResizeMode): string {
   }
 }
 
-export function OrcaVideoPlayer({
-  source,
-  uriIndex = 0,
-  autoplay = false,
-  muted = false,
-  controls = false,
-  resizeMode = 'contain',
-  preload = false,
-  loop = false,
-  onProgress,
-  onEnd,
-  style,
-}: OrcaVideoPlayerProps) {
+export const OrcaVideoPlayer = forwardRef<
+  OrcaVideoPlayerHandle,
+  OrcaVideoPlayerProps
+>(function OrcaVideoPlayerWithRef(
+  {
+    source,
+    uriIndex = 0,
+    autoplay = false,
+    muted = false,
+    controls = false,
+    resizeMode = 'contain',
+    preload = false,
+    loop = false,
+    onProgress,
+    onEnd,
+    style,
+  },
+  ref
+) {
   const resolvedSource = resolveVideoSource(source, uriIndex);
   const videoRef = useRef<VideoElement | null>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      play() {
+        videoRef.current?.play().catch(() => {});
+      },
+      pause() {
+        videoRef.current?.pause();
+      },
+      seekTo(seconds) {
+        if (videoRef.current) {
+          videoRef.current.currentTime = seconds;
+        }
+      },
+    }),
+    []
+  );
 
   useEffect(() => {
     const video = videoRef.current;
@@ -81,7 +116,7 @@ export function OrcaVideoPlayer({
       })}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

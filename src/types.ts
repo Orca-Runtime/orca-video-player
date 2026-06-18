@@ -2,6 +2,12 @@ import type { StyleProp, ViewStyle } from 'react-native';
 
 export type ResizeMode = 'cover' | 'contain' | 'stretch';
 
+export interface OrcaVideoPlayerHandle {
+  play(): void;
+  pause(): void;
+  seekTo(seconds: number): void;
+}
+
 export interface VideoSource {
   uri: string | string[];
   headers?: Record<string, string>;
